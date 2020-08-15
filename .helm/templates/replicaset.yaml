@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: {{ template "lumen.fullname" . }}
+  labels: {{- include "lumen.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "lumen.matchLabels" . | nindent 6 }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels: {{- include "lumen.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
+      {{- end }}
+      imagePullSecrets:
+      - name: harbor-cred
+      containers:
+        - name: lumen
+          image: {{ template "lumen.image" . }}
+          imagePullPolicy: {{ .Values.lumen.image.pullPolicy | quote }}
+          envFrom:
+          - secretRef:
+              name: {{ template "lumen.fullname" . }}
+          ports:
+            - name: lumen
+              containerPort: {{ .Values.lumen.applicationPort }}
+          {{- if .Values.lumen.resources }}
+          resources: {{- toYaml .Values.lumen.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.lumen.livenessProbe }}
+          livenessProbe: {{- toYaml .Values.lumen.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.lumen.readinessProbe }}
+          readinessProbe: {{- toYaml .Values.lumen.readinessProbe | nindent 12 }}
+          {{- end }}

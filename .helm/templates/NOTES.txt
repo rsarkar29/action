@@ -1,0 +1,3 @@
+
+
+The chart {{ .Release.Name }} has been installed in {{ .Release.Namespace }}

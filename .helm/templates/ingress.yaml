@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}
+{{- range .Values.ingress.hosts }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "lumen.fullname" $ }}
+  labels: {{- include "lumen.labels" $ | nindent 4 }}
+  annotations:
+    {{- if .certManager }}
+    kubernetes.io/tls-acme: "true"
+    {{- end }}
+    {{- range $key, $value := .annotations }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  rules:
+    - http:
+        paths:
+          - path: {{ default "/" .path }}
+            backend:
+              serviceName: {{ template "lumen.fullname" $ }}
+              servicePort: {{ $.Values.service.port }}
+  {{- if .tls }}
+  tls:
+    - hosts:
+        - {{ .name }}
+      secretName: {{ .tlsSecret }}
+  {{- end }}
+{{- end }}
+{{- end }}

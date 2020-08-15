@@ -1,0 +1,14 @@
+{{- if .Values.HPA.enabled }}
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "lumen.fullname" . }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: ReplicaSet
+    name: {{ template "lumen.fullname" . }}
+  minReplicas: {{ .Values.HPA.minReplicas }}
+  maxReplicas: {{ .Values.HPA.maxReplicas }}
+  targetCPUUtilizationPercentage: {{ .Values.HPA.targetCPUUtilizationPercentage }}
+{{- end }}
