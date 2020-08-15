@@ -1,16 +1,24 @@
-on: push
-name: deploy
+on:
+  push:
+    branches:
+      - master
+      - stage
+      - dev
+name: CI
 jobs:
   deploy:
-    name: deploy to cluster
+    name: Docker Build and push
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: deploy postgres to cluster
-      uses: wahyd4/kubectl-helm-action@master
-      env:
-        KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-      with:
-        args: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm upgrade --install postgres -n data bitnami/postgresql
+      - uses: actions/checkout@v1.0
+        name: Check out code
+    
+      - uses: mr-smithers-excellent/docker-build-push@v4
+        name: Build & push Docker image
+        with:
+          image: rudranil29/drupal
+          tag: $GITHUB_REF_NAME_SLUG-$GITHUB_SHA_SHORT
+          registry: docker.io
+          dockerfile: Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
