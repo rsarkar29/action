@@ -15,5 +15,6 @@ jobs:
         with:
           image: rudranil29/drupal
           registry: docker.io
+          dockerfile: Dockerfile.ci 
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
