@@ -18,7 +18,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: rudranil29/drupal
+          repository: rudranil29/node-demo
           tags: ${{ github.sha }}
 
   deploy:
@@ -31,5 +31,5 @@ jobs:
       - name: helm deploy
         uses: WyriHaximus/github-action-helm3@v2
         with:
-          exec: helm upgrade rudra .helm/ -f .helm/values.yaml --set lumen.image.repository=rudranil29/drupal:${{ github.sha }} --namespace github
+          exec: helm upgrade nodeserver ./.helm --set=image.tag=${{ github.sha }} --namespace github
           kubeconfig: '${{ secrets.KUBECONFIG }}'
